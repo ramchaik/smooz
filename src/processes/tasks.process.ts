@@ -7,7 +7,7 @@ module.exports = async (job: SandboxedJob) => {
     throw new Error("job failed - test failing");
   }
 
-  for (let i = 0; i < 1000; i++) {}
+  // for (let i = 0; i < 1000; i++) {}
 
   return { done: true };
 };

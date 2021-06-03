@@ -2,9 +2,11 @@ import bodyParser from "body-parser";
 import express from "express";
 import { tasksQueue } from "./queue/tasks.queue";
 import { validate, validationQueue } from "./queue/validation.queue";
-const { createBullBoard } = require("@bull-board/api");
-const { BullMQAdapter } = require("@bull-board/api/bullMQAdapter");
-const { ExpressAdapter } = require("@bull-board/express");
+import { updatesQueue } from "./queue/updates.queue";
+import { createBullBoard } from "@bull-board/api";
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
+import { ExpressAdapter } from "@bull-board/express";
+
 const serverAdapter = new ExpressAdapter();
 
 const app = express();
@@ -13,7 +15,11 @@ const PORT = 8080;
 app.use(bodyParser.json());
 
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-  queues: [new BullMQAdapter(tasksQueue), new BullMQAdapter(validationQueue)],
+  queues: [
+    new BullMQAdapter(tasksQueue),
+    new BullMQAdapter(validationQueue),
+    new BullMQAdapter(updatesQueue),
+  ],
   serverAdapter: serverAdapter,
 });
 
