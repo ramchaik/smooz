@@ -1,16 +1,33 @@
-import Bull from "bull";
-import validationProcess from "../processes/validation.process";
+import { Job, Queue, Worker } from 'bullmq';
+import IORedis from 'ioredis';
+import path from 'path';
 
-const validationQueue = new Bull("validation", {
-  redis: "localhost:6380",
+const connection = new IORedis();
+
+const queueName = "validation";
+
+const validationQueue = new Queue(queueName, { connection });
+
+const processorFile = path.join(__dirname, '../processes/validation.process.ts');
+const validationWorker = new Worker(queueName, processorFile);
+
+validationWorker.on("completed", (job: Job, returnvalue: any) => {
+  console.log('BULLMQ `completed` the job')
 });
 
-validationQueue.process(validationProcess);
+validationWorker.on("progress", (job: Job, progress: number | object) => {
+  console.log('BULLMQ `progress` the job'); 
+});
+
+validationWorker.on("failed", (job: Job, failedReason: string) => {
+  console.log('BULLMQ `failed` the job') 
+});
 
 const validate = (data: any) => {
-  validationQueue.add(data, {
+  validationQueue.add(queueName, data, {
     attempts: 3,
   });
 };
 
 export { validate, validationQueue };
+

@@ -1,14 +1,30 @@
-import Bull from "bull";
-import tasksProcess from "../processes/tasks.process";
+import { Job, Queue, Worker } from 'bullmq';
+import IORedis from 'ioredis';
+import path from 'path';
 
-const tasksQueue = new Bull("tasks", {
-  redis: "localhost:6380",
+const connection = new IORedis();
+
+const queueName = "tasks";
+
+const tasksQueue = new Queue(queueName, { connection });
+
+const processorFile = path.join(__dirname, '../processes/tasks.process.ts');
+const taskWorker = new Worker(queueName, processorFile);
+
+taskWorker.on("completed", (job: Job, returnvalue: any) => {
+  console.log('BULLMQ `completed` the job')
 });
 
-tasksQueue.process(tasksProcess);
+taskWorker.on("progress", (job: Job, progress: number | object) => {
+  console.log('BULLMQ `progress` the job'); 
+});
+
+taskWorker.on("failed", (job: Job, failedReason: string) => {
+  console.log('BULLMQ `failed` the job') 
+});
 
 const doTask = (data: any) => {
-  tasksQueue.add(data, {
+  tasksQueue.add(queueName, data, {
     attempts: 3,
   });
 };

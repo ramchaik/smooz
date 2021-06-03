@@ -1,16 +1,13 @@
-import { Job } from "bull";
+import { SandboxedJob } from "bullmq";
 
-const tasksProcess = async (job: Job) => {
+module.exports = async (job: SandboxedJob) => {
+  console.log(" ------ Tasks process -----");
+
   if (Math.random() * 10 > 5) {
     throw new Error("job failed - test failing");
   }
 
-  for (let i = 0; i < 1000; i++) {
-    console.log(i + "processing");
-    console.log(job.data);
-  }
+  for (let i = 0; i < 1000; i++) {}
 
   return { done: true };
 };
-
-export default tasksProcess;
