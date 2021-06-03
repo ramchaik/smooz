@@ -12,7 +12,8 @@ const tasksQueue = new Queue(queueName, { connection });
 
 const processorFile = path.join(__dirname, "../processes/tasks.process.ts");
 const taskWorker = new Worker(queueName, processorFile, {
-  concurrency: 10,
+  concurrency: 5,
+  lockDuration: 600000,
 });
 
 taskWorker.on("completed", (job: Job, returnvalue: any) => {

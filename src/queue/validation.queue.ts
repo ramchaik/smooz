@@ -15,7 +15,8 @@ const processorFile = path.join(
   "../processes/validation.process.ts"
 );
 const validationWorker = new Worker(queueName, processorFile, {
-  concurrency: 10,
+  concurrency: 5,
+  lockDuration: 600000,
 });
 
 validationWorker.on("completed", (job: Job, returnvalue: any) => {

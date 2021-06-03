@@ -11,7 +11,8 @@ const updatesQueue = new Queue(queueName, { connection });
 
 const processorFile = path.join(__dirname, "../processes/updates.process.ts");
 const updatesWorker = new Worker(queueName, processorFile, {
-  concurrency: 10,
+  concurrency: 5,
+  lockDuration: 600000,
 });
 
 updatesWorker.on("completed", (job: Job, returnvalue: any) => {
