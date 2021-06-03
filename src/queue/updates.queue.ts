@@ -1,4 +1,4 @@
-import { Job, Queue, Worker } from "bullmq";
+import { Job, Queue, QueueScheduler, Worker } from "bullmq";
 import IORedis from "ioredis";
 import path from "path";
 
@@ -6,6 +6,7 @@ const connection = new IORedis();
 
 const queueName = "updates";
 
+const updatesQueueSchedule = new QueueScheduler(queueName);
 const updatesQueue = new Queue(queueName, { connection });
 
 const processorFile = path.join(__dirname, "../processes/updates.process.ts");
